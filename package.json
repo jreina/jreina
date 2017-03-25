@@ -1,0 +1,24 @@
+{
+  "name": "jreina",
+  "version": "1.0.0",
+  "description": "Get Johnny",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jreina/jreina.git"
+  },
+  "keywords": [
+    "johnny",
+    "reina",
+    "jreina"
+  ],
+  "author": "Johnny Reina <johnny.r.reina@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jreina/jreina/issues"
+  },
+  "homepage": "https://github.com/jreina/jreina#readme"
+}
