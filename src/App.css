@@ -1,0 +1,27 @@
+:root {
+  --green1: #04e9ac;
+  --green2: #7cfcda;
+  --green3: #10845c;
+  --gray1: #7b7c7c;
+  --gray2: #c6ccca;
+  --gray3: #444444;
+}
+
+body {
+  background-color: var(--gray3);
+}
+
+.terminal {
+  color: var(--green1);
+  margin-bottom: 20px;
+}
+
+.terminal-input,
+.terminal-input:focus {
+  border: none;
+  outline: none;
+  caret-color: var(--green1);
+  background-color: transparent;
+  color: var(--green1);
+  font-family: monospace;
+}
