@@ -2,37 +2,27 @@ import { BASE_FS } from "./const/BaseFileSystem";
 import { Session } from "./Session";
 import { cd } from "./std/cd";
 import { chmod } from "./std/chmod";
+import { echo } from "./std/echo";
 import { ls } from "./std/ls";
 import { mkdir } from "./std/mkdir";
 import { pwd } from "./std/pwd";
 import { rm } from "./std/rm";
 import { touch } from "./std/touch";
-import { DataNode, DirectoryNode, FileNode } from "./types/FileNode";
+import { DirectoryNode, FileNode } from "./types/FileNode";
 import { IProgram } from "./types/IProgram";
 
 export class Computer {
   private _fs: FileNode = BASE_FS;
-  // TODO - ideally this should handle multiple sessions?
-  private _session = new Session(this._fs as DirectoryNode);
-
-  public listen(
-    stdout?: (message: string) => void,
-    stderr?: (message: string) => void
-  ) {
-    this._session.listen(stdout, stderr);
-  }
+  private _sessions: Array<Session> = [];
 
   public start() {
-    this._session.stdout("Welcome to the\nGibson Supercomputer\n\n");
-    this._awaitInput();
-  }
-
-  public input(message: string) {
-    this._processInput(message);
+    const session = new Session(this._fs as DirectoryNode, this);
+    this._sessions.push(session);
+    return session;
   }
 
   // TODO - this sucks. make it better
-  private _bins = new Map<string, IProgram>([
+  public bins = new Map<string, IProgram>([
     ["cd", cd],
     ["pwd", pwd],
     ["ls", ls],
@@ -40,28 +30,9 @@ export class Computer {
     ["touch", touch],
     ["chmod", chmod],
     ["rm", rm],
+    ["echo", echo],
   ]);
-  private _executeFn(fn: IProgram, session: Session, args: Array<string>) {
-    fn(session, ...args);
-  }
 
-  private _executeFile(file: DataNode, session: Session, args: Array<string>) {
-    // parse file into function (danger)
-    // executeFn
-  }
-
-  private _processInput(input: string) {
-    const [command, ...args] = input.split(" ");
-    const builtin = this._bins.get(command);
-    if (builtin) {
-      this._executeFn(builtin, this._session, args);
-    } else {
-      this._session.stderr(`Command not found: ${command}`);
-    }
-    this._awaitInput();
-  }
-
-  private _awaitInput = () => {
-    this._session.stdout(`${this._session.cwd.path}> `);
-  };
+  public header = "Welcome to the\nGibson Supercomputer\nVersion 6.66\n";
+  public hostname = "heavymetal";
 }

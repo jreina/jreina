@@ -1,8 +1,10 @@
-export enum EventTypes {
+export enum EventType {
   stdout = "stdout",
   stderr = "stderr",
+  stdin = "stdin",
   bufferChange = "bufferChange",
   statusChange = "statusChange",
+  inputModeChange = "inputModeChange",
 }
 
 export enum ComputerStatus {

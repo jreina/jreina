@@ -19,5 +19,8 @@ export const touch: IProgram = (session, name) => {
       group: Permission.Read,
       owner: (Permission.Read & Permission.Write) as PermissionValue,
     },
+    group: session.user.groups[0],
+    owner: session.user.username,
+    created: new Date(),
   });
 };

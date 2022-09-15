@@ -1,29 +1,33 @@
 import { FileNodeType } from "../const/FileNodeType";
 import { PermissionValue } from "../const/PermissionValue";
 
+export type PermissionSet = {
+  owner: PermissionValue;
+  group: PermissionValue;
+  others: PermissionValue;
+};
+
+export type INode = {
+  path: string;
+  name: string;
+  owner: string;
+  /**
+   * Group owner of the file.
+   */
+  group: string;
+  created: Date;
+  permissions: PermissionSet;
+};
+
 export type FileNode =
-  | {
+  | (INode & {
       type: FileNodeType.Directory;
-      path: string;
-      name: string;
       files: Array<FileNode>;
-      permissions: {
-        owner: PermissionValue;
-        group: PermissionValue;
-        others: PermissionValue;
-      };
-    }
-  | {
+    })
+  | (INode & {
       type: FileNodeType.Data;
-      path: string;
-      name: string;
       data: string;
-      permissions: {
-        owner: PermissionValue;
-        group: PermissionValue;
-        others: PermissionValue;
-      };
-    };
+    });
 
 export type DirectoryNode = Extract<FileNode, { type: FileNodeType.Directory }>;
 export type DataNode = Extract<FileNode, { type: FileNodeType.Data }>;

@@ -2,11 +2,15 @@ import React, { useRef, useState } from "react";
 import { useEffect } from "react";
 import { Computer } from "./Computer";
 import "./App.css";
+import { EventType } from "./const/EventType";
+import { InputMode } from "./const/InputMode";
 const comp = new Computer();
+const session = comp.start();
 
 function App() {
   const [buffer, setBuffer] = useState<string>("");
   const [input, setInput] = useState("");
+  const [inputMode, setInputMode] = useState(InputMode.Public);
   const mounted = useRef(false);
 
   useEffect(() => {
@@ -19,7 +23,7 @@ function App() {
 
   useEffect(() => {
     if (mounted.current) {
-      comp.listen(
+      session.listen(
         (message) => {
           setBuffer((buff) => `${buff}\n${message}`);
         },
@@ -27,10 +31,14 @@ function App() {
           setBuffer((buff) => `${buff}\n${message}`);
         }
       );
-      comp.start();
+
+      session.on(EventType.inputModeChange, (mode: InputMode) => {
+        setInputMode(mode);
+      });
+
+      session.init();
     }
   }, []);
-
 
   function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
     setInput(e.target.value);
@@ -38,9 +46,15 @@ function App() {
   function handleInputKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === "Enter") {
       e.preventDefault();
-      setBuffer(buff => `${buff}${input}`)
-      comp.input(input);
-      setInput('');
+      const inputValue =
+        inputMode === InputMode.Protected
+          ? input.replace(/./g, "*")
+          : inputMode === InputMode.Private
+          ? "***"
+          : input;
+      setBuffer((buff) => `${buff}${inputValue}`);
+      session.stdin(input);
+      setInput("");
     }
   }
   return (
@@ -53,6 +67,11 @@ function App() {
           onKeyDown={handleInputKeyDown}
           autoFocus
           className="terminal-input"
+          type={
+            [InputMode.Protected, InputMode.Private].includes(inputMode)
+              ? "password"
+              : "text"
+          }
         />
       </pre>
     </div>

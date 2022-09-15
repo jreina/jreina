@@ -33,5 +33,9 @@ export const mkdir: IProgram = (session, name) => {
     name,
     path: cwd.path === "/" ? `/${name}` : `${cwd.path}/${name}`,
     permissions: BASE_PERMISSIONS,
+    created: new Date(),
+    group: session.user.groups[0],
+    owner: session.user.username,
   });
+  return session.exit();
 };

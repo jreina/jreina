@@ -1,6 +1,6 @@
 import { FileNode } from "../types/FileNode";
 import { FileNodeType } from "./FileNodeType";
-import { Permission } from "./PermissionValue";
+import { Permission, PermissionValue } from "./PermissionValue";
 
 export const BASE_PERMISSIONS = {
   others: Permission.Read,
@@ -12,6 +12,9 @@ export const BASE_FS: FileNode = {
   path: "/",
   name: "/",
   permissions: BASE_PERMISSIONS,
+  group: "root",
+  owner: "root",
+  created: new Date(),
   files: [
     {
       type: FileNodeType.Directory,
@@ -19,6 +22,9 @@ export const BASE_FS: FileNode = {
       name: "bin",
       path: "",
       permissions: BASE_PERMISSIONS,
+      group: "root",
+      owner: "root",
+      created: new Date(),
     },
     {
       type: FileNodeType.Directory,
@@ -26,13 +32,34 @@ export const BASE_FS: FileNode = {
       name: "dev",
       path: "",
       permissions: BASE_PERMISSIONS,
+      group: "root",
+      owner: "root",
+      created: new Date(),
     },
     {
       type: FileNodeType.Directory,
-      files: [],
+      files: [
+        {
+          type: FileNodeType.Data,
+          created: new Date(),
+          data: "johnny:$2b$10$JPUr/b61ZgPNi2LNcOHGDO0u7i33ROi2GHn2NikVMKEgG.rzKPeMi:9:15::/home/johnny:/bin/three\nroot:$2a$10$S6HWkeI10e95FzVd3uuPM.hrg8yrMivA9faCcHcZm2mlWQ3AQvGAO:0:0::/home/root:/bin/three",
+          group: "root",
+          owner: "root",
+          name: "passwd",
+          path: "",
+          permissions: {
+            owner: (Permission.Read | Permission.Write) as PermissionValue,
+            group: Permission.Read,
+            others: Permission.Read,
+          },
+        },
+      ],
       name: "etc",
       path: "",
       permissions: BASE_PERMISSIONS,
+      group: "root",
+      owner: "root",
+      created: new Date(),
     },
     {
       type: FileNodeType.Directory,
@@ -43,6 +70,9 @@ export const BASE_FS: FileNode = {
           name: "johnny",
           path: "",
           permissions: BASE_PERMISSIONS,
+          group: "root",
+          owner: "root",
+          created: new Date(),
         },
         {
           type: FileNodeType.Directory,
@@ -50,11 +80,17 @@ export const BASE_FS: FileNode = {
           name: "root",
           path: "",
           permissions: BASE_PERMISSIONS,
+          group: "root",
+          owner: "root",
+          created: new Date(),
         },
       ],
       name: "home",
       path: "",
       permissions: BASE_PERMISSIONS,
+      group: "root",
+      owner: "root",
+      created: new Date(),
     },
     {
       type: FileNodeType.Directory,
@@ -62,6 +98,9 @@ export const BASE_FS: FileNode = {
       name: "lib",
       path: "",
       permissions: BASE_PERMISSIONS,
+      group: "root",
+      owner: "root",
+      created: new Date(),
     },
     {
       type: FileNodeType.Directory,
@@ -69,6 +108,9 @@ export const BASE_FS: FileNode = {
       name: "media",
       path: "",
       permissions: BASE_PERMISSIONS,
+      group: "root",
+      owner: "root",
+      created: new Date(),
     },
     {
       type: FileNodeType.Directory,
@@ -76,6 +118,9 @@ export const BASE_FS: FileNode = {
       name: "proc",
       path: "",
       permissions: BASE_PERMISSIONS,
+      group: "root",
+      owner: "root",
+      created: new Date(),
     },
     {
       type: FileNodeType.Directory,
@@ -83,6 +128,9 @@ export const BASE_FS: FileNode = {
       name: "tmp",
       path: "",
       permissions: BASE_PERMISSIONS,
+      group: "root",
+      owner: "root",
+      created: new Date(),
     },
     {
       type: FileNodeType.Directory,
@@ -90,6 +138,9 @@ export const BASE_FS: FileNode = {
       name: "usr",
       path: "",
       permissions: BASE_PERMISSIONS,
+      group: "root",
+      owner: "root",
+      created: new Date(),
     },
     {
       type: FileNodeType.Directory,
@@ -97,6 +148,9 @@ export const BASE_FS: FileNode = {
       name: "var",
       path: "",
       permissions: BASE_PERMISSIONS,
+      group: "root",
+      owner: "root",
+      created: new Date(),
     },
   ],
 };
