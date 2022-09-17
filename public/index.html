@@ -15,6 +15,31 @@
       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
     -->
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <script>
+      function r(char) {
+        const m = [..."abcdefghijklmnopqrstuvwxyz_-"];
+        const idx = m.indexOf(char);
+        return m[idx + 14 > 27 ? idx - 14 : idx + 14];
+      }
+      function rs(chars) {
+        return [...chars].map(r).join("");
+      }
+      const d = {
+        "hsdkmebsqwozmo-ozkfwqemtg-qfwa-"() {
+          window[rs("qa-eazs")][rs("zau")](
+            "aSB3b25kZXIgaWYgdGhlcmUgYXJlIGFueSBpbnRlcmVzdGluZyBmdW5jdGlvbnMgYXR0YWNoZWQgdG8gdGhlIHdpbmRvdyBvYmplY3Q/8J+klA=="
+          );
+        },
+      };
+
+      d["hsdkmebsqwozmo-ozkfwqemtg-qfwa-"]();
+
+      window[String.fromCodePoint(0x1f914)] = () => {
+        console.log(
+          "eyJkZWJ1Z19pbmZvIjp7ImVudiI6eyJvcyI6ImdpYnNvbiIsInZlcnNpb24iOiI2LjY2Iiwia2VybmVsIjoiMC40LjIwIn0sIl9faGlkZGVuIjp7InRyYXNoX2ZpbGUiOiJlVzkxSUcxaFpHVWdhWFFnZEdocGN5Qm1ZWEl1SUd0bFpYQWdiRzl2YTJsdVp5NHVMZz09IiwicGFzc3dvcmRzIjpbImd1ZXN0IiwiMGMyNDE0ZTA5ZDRkNDM5NmI3YzZiNzUxNzVjNmU5ODUiXX19fQ=="
+        );
+      };
+    </script>
     <!--
       Notice the use of %PUBLIC_URL% in the tags above.
       It will be replaced with the URL of the `public` folder during the build.
