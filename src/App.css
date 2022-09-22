@@ -14,6 +14,8 @@ body {
 .terminal {
   color: var(--green1);
   margin-bottom: 20px;
+  width: 100%;
+  max-width: 100%;
 }
 
 .terminal-input,
@@ -24,4 +26,12 @@ body {
   background-color: transparent;
   color: var(--green1);
   font-family: monospace;
+  width: 100%;
+  max-width: 100%;
+}
+.cursor {
+  height: 1rem;
+  width: 10px;
+  background-color: var(--gray1);
+  display: inline-block;
 }

@@ -3,14 +3,21 @@ import { useEffect } from "react";
 import { Computer } from "./Computer";
 import "./App.css";
 import { EventType } from "./const/EventType";
-import { InputMode } from "./const/InputMode";
+
 const comp = new Computer();
 const session = comp.start();
 
+function formatBuffer(buffer: string) {
+  return (
+    <>
+      {buffer}
+      <div className="cursor"></div>
+    </>
+  );
+}
+
 function App() {
   const [buffer, setBuffer] = useState<string>("");
-  const [input, setInput] = useState("");
-  const [inputMode, setInputMode] = useState(InputMode.Public);
   const mounted = useRef(false);
 
   useEffect(() => {
@@ -23,58 +30,64 @@ function App() {
 
   useEffect(() => {
     if (mounted.current) {
-      session.listen(
-        (message) => {
-          setBuffer((buff) => `${buff}\n${message}`);
-        },
-        (message) => {
-          setBuffer((buff) => `${buff}\n${message}`);
-        }
-      );
-
-      session.on(EventType.inputModeChange, (mode: InputMode) => {
-        setInputMode(mode);
-      });
+      session.on(EventType.bufferChange, setBuffer);
 
       session.init();
     }
   }, []);
 
-  function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
-    setInput(e.target.value);
-  }
-  function handleInputKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      const inputValue =
-        inputMode === InputMode.Protected
-          ? input.replace(/./g, "*")
-          : inputMode === InputMode.Private
-          ? "***"
-          : input;
-      setBuffer((buff) => `${buff}${inputValue}`);
-      session.stdin(input);
-      setInput("");
-    }
+  useEffect(() => {
+    document.addEventListener("keydown", handleInputKeyDown);
+
+    // Don't forget to clean up
+    return function cleanup() {
+      document.removeEventListener("keydown", handleInputKeyDown);
+    };
+  }, []);
+
+  function handleInputKeyDown(e: KeyboardEvent) {
+    e.preventDefault();
+    const isEnter = e.key === "Enter";
+    const isBackspace = e.key === "Backspace";
+    const isMeta = e.key === "Meta";
+    const isArrowLeft = e.key === "ArrowLeft";
+    const isArrowUp = e.key === "ArrowUp";
+    const isArrowRight = e.key === "ArrowRight";
+    const isArrowDown = e.key === "ArrowDown";
+    const isTab = e.key === "Tab";
+    const isDelete = e.key === "Delete";
+    const isHome = e.key === "Home";
+    const isEnd = e.key === "End";
+    const isPageUp = e.key === "PageUp";
+    const isPageDown = e.key === "PageDown";
+    const isInsert = e.key === "Insert";
+
+    const isSpecial = e.key.length > 1;
+
+    session.receiveKeyStroke(isSpecial ? null : e.key, {
+      alt: e.altKey,
+      ctrl: e.ctrlKey,
+      enter: isEnter,
+      backspace: isBackspace,
+      arrowDown: isArrowDown,
+      arrowLeft: isArrowLeft,
+      arrowRight: isArrowRight,
+      arrowUp: isArrowUp,
+      delete: isDelete,
+      end: isEnd,
+      home: isHome,
+      insert: isInsert,
+      meta: isMeta,
+      pageDown: isPageDown,
+      pageUp: isPageUp,
+      tab: isTab,
+    });
   }
   return (
-    <div>
-      <pre className="terminal">
-        {buffer}
-        <input
-          value={input}
-          onChange={handleInputChange}
-          onKeyDown={handleInputKeyDown}
-          autoFocus
-          className="terminal-input"
-          type={
-            [InputMode.Protected, InputMode.Private].includes(inputMode)
-              ? "password"
-              : "text"
-          }
-        />
-      </pre>
-    </div>
+    <pre className="terminal">
+      {buffer}
+      <div className="cursor"></div>
+    </pre>
   );
 }
 

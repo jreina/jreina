@@ -9,6 +9,7 @@ import { IProgram } from "./types/IProgram";
 import { User } from "./types/User";
 import { compareSync } from "bcryptjs";
 import { getUser } from "./internal/data/UserData";
+import { eeval } from "./utils/eval";
 /**
  * Handles everything for an individual session.
  */
@@ -17,9 +18,12 @@ export class Session {
   private _user!: User;
   private _status = SessionStatus.Idle;
   private _inputMode = InputMode.Public;
+  private _buffer = "";
 
   constructor(public cwd: DirectoryNode, public computer: Computer) {
     this._feedback.on(EventType.stdin, this._processInput);
+    this._feedback.on(EventType.stdout, this._appendToBuffer);
+    this._feedback.on(EventType.stderr, this._appendToBuffer);
   }
 
   public get inputMode() {
@@ -52,8 +56,18 @@ export class Session {
     this._feedback.emit(EventType.stdin, message);
   };
 
+  /**
+   * Add a listener for an event type.
+   */
   on = (event: EventType, handler: (arg: any) => void) => {
     this._feedback.on(event, handler);
+  };
+
+  /**
+   * Add a one-time listener for an event type.
+   */
+  once = (event: EventType, handler: (arg: any) => void) => {
+    this._feedback.once(event, handler);
   };
 
   exit = (code?: number) => {
@@ -65,50 +79,6 @@ export class Session {
   setCwd = (node: DirectoryNode) => {
     this.cwd = node;
   };
-
-  public listen(
-    stdout?: (message: string) => void,
-    stderr?: (message: string) => void,
-    stdin?: (message: string) => void
-  ) {
-    if (stdout) {
-      this._feedback.on(EventType.stdout, (message) => {
-        stdout(message);
-      });
-    }
-    if (stderr) {
-      this._feedback.on(EventType.stderr, (message) => {
-        stderr(message);
-      });
-    }
-    if (stdin) {
-      this._feedback.on(EventType.stdin, (message) => {
-        stdin(message);
-      });
-    }
-  }
-
-  public listenOnce(
-    stdout?: (message: string) => void,
-    stderr?: (message: string) => void,
-    stdin?: (message: string) => void
-  ) {
-    if (stdout) {
-      this._feedback.once(EventType.stdout, (message) => {
-        stdout(message);
-      });
-    }
-    if (stderr) {
-      this._feedback.once(EventType.stderr, (message) => {
-        stderr(message);
-      });
-    }
-    if (stdin) {
-      this._feedback.once(EventType.stdin, (message) => {
-        stdin(message);
-      });
-    }
-  }
 
   public get user() {
     return this._user;
@@ -131,9 +101,14 @@ export class Session {
   };
 
   private async _executeFn(prog: IProgram, args: Array<string>) {
-    this._status = SessionStatus.Busy;
+    this.setStatus(SessionStatus.Busy);
     await prog(this, ...args);
-    this._status = SessionStatus.Idle;
+    this.setStatus(SessionStatus.Idle);
+  }
+
+  public setStatus(status: SessionStatus) {
+    this._status = status;
+    this._feedback.emit(EventType.statusChange, this._status);
   }
 
   private _awaitInput() {
@@ -177,5 +152,69 @@ export class Session {
 
   private _close() {
     this._feedback.removeAllListeners();
+  }
+
+  private _appendToBuffer = (message: string, newLine = true) => {
+    if (newLine) {
+      this._buffer += "\n";
+    }
+    const safeToPrintMessage =
+      this._inputMode === InputMode.Public
+        ? message
+        : message.replace(/./g, "*");
+    this._buffer += safeToPrintMessage;
+    this._feedback.emit(EventType.bufferChange, this._buffer);
+  };
+
+  private _inputBuffer = "";
+
+  private _popFromBuffer = () => {
+    if (this._inputBuffer.length === 0) {
+      return;
+    }
+    this._buffer = this._buffer.slice(0, -1);
+    this._inputBuffer = this._inputBuffer.slice(0, -1);
+    this._feedback.emit(EventType.bufferChange, this._buffer);
+  };
+
+  public receiveKeyStroke(
+    char: string | null,
+    special: {
+      ctrl?: boolean;
+      alt?: boolean;
+      enter?: boolean;
+      backspace?: boolean;
+      meta?: boolean;
+      arrowLeft?: boolean;
+      arrowRight?: boolean;
+      arrowUp?: boolean;
+      arrowDown?: boolean;
+      tab?: boolean;
+      delete?: boolean;
+      home?: boolean;
+      end?: boolean;
+      pageUp?: boolean;
+      pageDown?: boolean;
+      insert?: boolean;
+    }
+  ) {
+    if (char === null) {
+      // handle special characters
+      if (special.enter) {
+        this.stdin(this._inputBuffer);
+        this._inputBuffer = "";
+      }
+      if (special.backspace) {
+        this._popFromBuffer();
+      }
+      if (special.tab) {
+        eeval(this, this._inputBuffer);
+      }
+      return;
+    }
+
+    // handle normal characters
+    this._inputBuffer += char;
+    this._appendToBuffer(char, false);
   }
 }

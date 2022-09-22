@@ -8,14 +8,14 @@ export const cd: IProgram = (session: Session, path: string) => {
 
   if (target?.type === FileNodeType.Data) {
     session.stderr(`${path}: Not a directory`);
-    return session.exit(1);
+    return session.exit();
   }
 
   if (!target) {
     session.stderr(`${path}: No such file or directory`);
-    return session.exit(1);
+    return session.exit();
   }
 
   session.setCwd(target);
-  return session.exit(0);
+  return session.exit();
 };

@@ -1,5 +1,6 @@
 import { BASE_FS } from "./const/BaseFileSystem";
 import { Session } from "./Session";
+import { cat } from "./std/cat";
 import { cd } from "./std/cd";
 import { chmod } from "./std/chmod";
 import { echo } from "./std/echo";
@@ -8,6 +9,7 @@ import { mkdir } from "./std/mkdir";
 import { pwd } from "./std/pwd";
 import { rm } from "./std/rm";
 import { touch } from "./std/touch";
+import { whoami } from "./std/whoami";
 import { DirectoryNode, FileNode } from "./types/FileNode";
 import { IProgram } from "./types/IProgram";
 
@@ -23,6 +25,7 @@ export class Computer {
 
   // TODO - this sucks. make it better
   public bins = new Map<string, IProgram>([
+    ["cat", cat],
     ["cd", cd],
     ["pwd", pwd],
     ["ls", ls],
@@ -31,6 +34,7 @@ export class Computer {
     ["chmod", chmod],
     ["rm", rm],
     ["echo", echo],
+    ["whoami", whoami],
   ]);
 
   public header = "Welcome to the\nGibson Supercomputer\nVersion 6.66\n";
